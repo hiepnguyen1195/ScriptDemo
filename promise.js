@@ -52,7 +52,8 @@ var myFirstPromise = new Promise((resolve, reject) => {
 myFirstPromise.then((data) => {
   console.log('Got data! Promise fulfilled.');
   console.log('Random number is: ' + data);
-}, (error) => {
+})
+.catch((error) => {
   console.log('Promise rejected.');
   console.log(error.message);
 });
@@ -68,6 +69,10 @@ var firstMethod = () => {
   });
   return promise;
 };
+
+firstMethod.then(data => {
+  console.log(data)
+})
 
 
 var secondMethod = (someStuff) => {

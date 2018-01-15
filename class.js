@@ -1,3 +1,4 @@
+"use strict"; 
 class baseModel {
     constructor(options = {}, data = []) { // class constructor
         this.name = 'Base'
@@ -10,6 +11,8 @@ class baseModel {
         console.log(`Class name: ${this.name}`)
     }
 }
+let base = new baseModel({name: 'a', url: 'b'}, [4,5]);
+let base1 = new baseModel(undefined,[4,5]);
 class AccountModel extends baseModel {
     constructor(options, data) {
         super({private: true}, ['32113123123', '524214691']) //call the parent method with super
@@ -20,7 +23,12 @@ class AccountModel extends baseModel {
     // ... make XHR
         return this.data
     }
+    set accountsData(data){
+        this.data = data;
+    }
 }
+let accounts = new AccountModel();
+accounts.accountsData(4);
 
 let accounts = new AccountModel(5)
 accounts.getName()
@@ -89,3 +97,14 @@ console.log(defCircle, defRectangle);
 // Getter/Setter 
 let r = new Rectangle(50, 20, 30);
 console.log(r.area, r.height);
+
+
+class StaticMethodCall {
+    static staticMethod() {
+        return 'Static method has been called';
+    }
+    anotherStaticMethod() {
+        return 'not static';
+    }
+}
+StaticMethodCall.staticMethod(); 

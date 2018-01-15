@@ -3,7 +3,9 @@
   * These functions also lexically bind `this` value and are always anonymous.
   */
 var foo = ["Hello", "World"];
-let bar = foo.map(value => value.length);
+let bar = foo.map(value => {
+    return value.length
+});
 
 console.log(bar);
 

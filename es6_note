@@ -1,0 +1,65 @@
+1. export va export default
+  - lệnh export được sử dụng khi tạo các module để export các hàm, đối tượng hoặc giá trị nguyên thủy trong module có thể sử dụng bởi lệnh import
+  - lệnh exprot default: chỉ có duy nhất một giá trị mặc định được export trên một module
+  - Sử dụng export giá trị mặc định nếu muốn export một giá trị duy nhất hay có một giá trị trả về mặc định từ module của mình
+  - không thể dùng var, let hay const với export default
+2. Map va Set, weakmap weakset
+  2.1 Set
+	let numbers = new Set([1, 2, 3, 4]);
+	- set: sử dụng mảng để lưu trữ tập hợp các phần tử (chỉ có value)
+	- thao tac chinh: 
+		+ khởi tạo:  new Set()
+		+ thêm phần tử: .add()
+		+ Xóa phần tử: .delete(), xóa toàn bộ phần tử .clear()
+		+ kiểm tra tồn tại: .has()
+	- vòng lặp: for (let number of numbers){}
+	- chuyển đổi set sang array : let arr_numbers = [...numbers];
+	  nếu có 2 giá trị trùng nhau thì lấy 1 phần tử
+	- mapping và filtering
+		+ mapping: thiết lập giá trị cho mỗi lần lặp
+		+ filtering: lọc ra các phần tử được chọn
+  2.2 Map
+	- map: sử dụng mảng để lưu trữ tập hợp các phần tử có cấu trúc dạng key => value
+	- đối với map thì các key không được trùng, key có thể là string, number, const, NaN
+	- thao tac chinh: 
+		+ khởi tạo:  new Map()
+		+ thêm phần tử: .set('key', 'value')
+		+ Xóa phần tử: .delete(), xóa toàn bộ phần tử .clear()
+		+ kiểm tra tồn tại: .has()
+	- các hàm trong Map
+    + Hàm keys() - lấy danh sách keys
+    + Hàm values() - lấy danh sách values
+    + Hàm entries() - lấy danh sách keys + values
+  - vòng lặp: map.forEach((value, key) => {}
+  - mapping và filtering
+  
+  2.3 Weakmap
+    - là 1 loại dữ liệu giống map, tuy nhiên key truyên vào phải là 1 biến, biến này là 1 object(class, funciton, object)
+    - weakmap không thể nhận những kiểu giá trị nguyên thủy
+    - 
+  2.4 Weakset
+    - dữ liệu truyền vào luôn phải là 1 đối tượng
+  
+3. static trong class
+  khi gọi function sẽ ko phải khởi tạo đối tượng, thường viết cho những hàm dùng chung
+  static dc dung khi trong class cua ban co mot thanh phan ( thuoc tinh, hoac ham ) la bat bien voi moi doi tuong cua lop do ( bat bien ca doi voi su thay doi gia tri cua cac thuoc tinh ). Khi do ban dung khai bao static de tiet kiem bo nho.
+
+  static con mot cong dung khac ( day cung chinh la mot dac tinh cua static ). cac ham hay bien static chi co the truy xuat duoc qua class, khong the goi tu bat ki mot doi tuong nao cua lop. Cac ham static chi co the thao tac voi cac bien, thuoc tinh static.
+  Constructor va Destructor cua class la ngoai le, cac ham binh thuong khac khong truy xuat duoc bien static.
+4. promise 
+  - promise để xử lý kết quả của một hành động cụ thể
+  - Promise được khởi tạo thì có 3 trạng thái:
+    + Pending: Hành động đang chờ xử lý hoặc bị từ chối
+    + Fulfilled: Hành động xử lý xong và thành công
+    + Rejected: Hành động xử lý xong và thất bại
+  - tạo 1 promise : var promise = new Promise(function(resolve, reject){});
+    trong đó: + resolve là một hàm callback xử lý cho hành động thành công.
+              + reject là một hàm callback xử lý cho hành động thất bại.
+  - .then(): phương thức ghi nhận kết quả của trạng thái.
+5. Destructuring Assignment
+- là một cú pháp cho phép tách dữ liệu được lưu trữ bên trong array hoac object và gán chúng cho các biến riêng biệt.
+- Destructuring Assignment ra thành hai nhóm chính:
+  + Object Destructuring
+  + Array Destructuring
+
+    
