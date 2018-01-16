@@ -1,2 +1,2 @@
-import { sum , pi } from "./lib/math"
-console.log("2π = " + math.sum(math.pi, math.pi))
+import display_message from './math.js' 
+display_message()

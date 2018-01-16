@@ -1,4 +1,3 @@
-"use strict"; 
 class baseModel {
     constructor(options = {}, data = []) { // class constructor
         this.name = 'Base'

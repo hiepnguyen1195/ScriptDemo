@@ -1,7 +1,4 @@
-/**
-  * Arrow functions have shorter syntax than function expressions.
-  * These functions also lexically bind `this` value and are always anonymous.
-  */
+
 var foo = ["Hello", "World"];
 let bar = foo.map(value => {
     return value.length
@@ -13,7 +10,7 @@ console.log(bar);
 var domain = ["abcd", 'tesst', 'helloword'];
  
 domain.map((val, key) => {
-    console.log(val.toUpperCase());
+    console.log(key, val.toUpperCase());
 });
 
 //set timeout Arrow Function

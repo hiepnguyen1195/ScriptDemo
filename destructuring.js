@@ -35,7 +35,7 @@ var date = {
     month : 06,
     year : 2016
 }
-var {day : d, month : m, year : y} = date;
+var {day : d, month : m, year : y, minute :m = 1} = date;
  
 console.log("Day: " + d);
 console.log("Month: " + m);

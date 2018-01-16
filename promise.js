@@ -1,22 +1,4 @@
-function foo ()
-{
-  console.log("foo");
-}
- 
-function bar ( )
-{
-  console.log("bar");
-  foo();
-}
- 
-function baz ()
-{
-  console.log("baz");
-}
- 
-////Execute function to test Messages queue & call stack
-bar();
-baz();
+
 
 // setTimeout( () => {
 //   console.log("Test setTimeout");
@@ -98,3 +80,16 @@ var thirdMethod = (someStuff) => {
 };
 
 firstMethod().then(secondMethod).then(thirdMethod);
+
+let promise = new Promise((resolve, reject) => {
+  let k =1;
+  let interval = window.setInterval(()=>{
+    k++;
+    if(k == 10){
+      resolve(k);
+    }
+  }, 1000);
+});
+promise.then((result)=>{
+  console.log(result);
+})
