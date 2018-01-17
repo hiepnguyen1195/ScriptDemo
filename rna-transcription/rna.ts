@@ -17,6 +17,7 @@ class Transcriptor {
             }
         }
         
+        //transcription dna
         let rna = nucleo.map(nucleo => {
             return mapRna[nucleo];
         }).join('');
