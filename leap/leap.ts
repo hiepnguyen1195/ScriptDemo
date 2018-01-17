@@ -9,4 +9,4 @@ let isLeapYear =  (year: number): boolean => {
 
     return (year % 4 === 0);
 };
-export default isLeapYear
+export  {isLeapYear};

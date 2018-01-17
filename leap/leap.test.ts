@@ -1,4 +1,4 @@
-import isLeapYear from './leap'
+import { isLeapYear } from './leap'
 
 describe('A leap year', () => {
 
