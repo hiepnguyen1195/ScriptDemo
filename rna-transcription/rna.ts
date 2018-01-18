@@ -1,4 +1,5 @@
-class Transcriptor {        
+class Transcriptor {
+    //chuyen tu dna sang rna        
     toRna(nucleotides: string){
         let mapRna: {[key: string]: string} = {
             "G": "C",
@@ -18,7 +19,7 @@ class Transcriptor {
         }
         
         //transcription dna
-        let rna = nucleo.map(nucleo => {
+        let rna = nucleo.map(nucleo => { // thiet lap gia tri cho moi lan lap
             return mapRna[nucleo];      
         }).join(''); // chuyen mang thanh chuoi
         

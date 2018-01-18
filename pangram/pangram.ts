@@ -9,7 +9,7 @@ class Pangram {
 
         let chartArr: string[] = alphabet.split('');
 
-        let panLower = this.pan.toLowerCase(); // chuyen ve chu thuong
+        let panLower = this.pan.toLowerCase();
 
         function isIncludes(letter: string) {
         
