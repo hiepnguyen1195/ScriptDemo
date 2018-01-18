@@ -1,9 +1,21 @@
-export function keep(arr:number[], method: any ) {
-    let result: number[] = [];
-    arr.forEach((e: number) => e < 10 && result.push(e));
+interface Function<T>{
+    (val: T ): boolean
+}
+export function keep<T>(arr:T[], fn: Function<T> ): T[] {
+    let result: T[] = [];
+    arr.forEach((val: T)=>{
+        if(fn(val)){
+            result.push(val);
+        }
+    });
     return result;
 }
-export function discard() {
-    let result: number[] = [];
+export function discard<T>(arr:T[], fn: Function<T> ): T[] {
+    let result: T[] = [];
+    arr.forEach((val: T)=>{
+        if(!fn(val)){
+            result.push(val);
+        }
+    });
     return result;
 }
