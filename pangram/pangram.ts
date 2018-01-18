@@ -11,14 +11,14 @@ class Pangram {
 
         let panLower = this.pan.toLowerCase(); // chuyen ve chu thuong
 
-        function isIncludes(letter: any) {
+        function isIncludes(letter: string) {
         
             let panArr = Array.from(panLower); // tach chuoi thanh mang
 
             return panArr.includes(letter); // tra ve true neu co phan tu trong mang
         }
         
-        let check = chartArr.every(isIncludes);// kiem tra tat ca phan tu trong mang co thoa man function cung cap
+        let check = chartArr.every(isIncludes);// kiem tra tat ca phan tu trong mang co thoa man function isIncludes
 
         return check;
     }
