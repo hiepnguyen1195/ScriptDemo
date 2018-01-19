@@ -7,26 +7,26 @@ class BinarySearchTree{
         this._data = data; 
     }
     get data(): number{
-        return this._data; // tra ve gia tri cua nut
+        return this._data; // trả về giá trị của nút
     }
     insert(value: number){ 
-        if(value <= this._data){ // neu gia tri truyen vao nho hon hoac bang nut cha add nhanh trai
+        if(value <= this._data){ // nếu giá trị chèn vào nhỏ hơn hoặc bằng nhánh cha add nhánh trái
             return this.insertLeft(value);
         }
-        if(value > this._data){ // neu gia tri truyen vao lon hon nut cha add nhanh trai
+        if(value > this._data){ // nếu giá trị chèn vào lớn hơn nhánh cha add nhánh phải
             return this.insertRight(value);
         }
     }
     insertLeft(value: number){ 
-        if(!this._left){ // chua co nhanh trai thi tao moi
+        if(!this._left){ // kiểm tra nếu không tồn tại nhánh trái
             this._left = new BinarySearchTree(value); // tao nhanh trai moi voi gia tri la value
         }else{
-            this._left.insert(value); // tiep tuc kiem tra gia tri truyen vao de chon nhanh
+            this._left.insert(value); // nếu tồn tại nhánh trái tiếp tục kiểm tra để gán giá trị
         }
     }
     insertRight(value: number){
         if(!this._right){
-            this._right = new BinarySearchTree(value); // tao moi nhanh phai voi gia tri tuyen vao la value
+            this._right = new BinarySearchTree(value); // tao moi nhanh phai voi gia tri truyen vao la value
         }else{
             this._right.insert(value);
         }
