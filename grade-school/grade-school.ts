@@ -12,6 +12,7 @@ class GradeSchool{
         let list = new Map<string, string[]>();
         let mapAsc = new Map([...this.map.entries()].sort()); // sắp xếp key map
         for (let entry of mapAsc.entries()){ // lấy danh sách key - value
+            console.log(entry[0], entry[1])
             list.set(String(entry[0]),[... entry[1]].sort()) // chuyển Set tên sang array và sắp xếp
         }
         return list;
