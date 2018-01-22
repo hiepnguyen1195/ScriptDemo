@@ -5,30 +5,42 @@ class WordProblem{
     }
     answer(): number{
         const operation = ['plus','minus','multiplied','divided'];
-        let requestion = this.question.slice(0, -1).split(' ');
-        console.log(requestion,requestion[3]);
-        if(requestion.length <= 6 ){
-            if(requestion.includes('plus')){
-                let result =  parseInt(requestion[2]) + parseInt(requestion[4]);
-                return result;
+        let requestion = this.question.slice(0, -1).split(' '); // tach chuoi cau hoi thanh mang
+        let arrOperation: string[] = []; // tao mang cac phep tinh
+        requestion.forEach(value => {
+            if(operation.includes(value)){
+                arrOperation.push(value);
             }
-            if(requestion.includes('minus')){
-                let result =  parseFloat(requestion[2]) - parseFloat(requestion[4]);
-                return result;
-            }
-            if(requestion.includes('multiplied')){
-                let result =  parseInt(requestion[2]) * parseInt(requestion[5]);
-                console.log(2);
-                return result;
-            }
-            if(requestion.includes('divided')){
-                let result =  parseInt(requestion[2]) / parseInt(requestion[5]);
-                return result;
-            }
+        });
+        // mang cac so
+        let getNumbers = (): number[] => (this.question.match(/\^?-?\d+/g) || []).map((match) => parseInt(match, 10));
+        let numbers: number[] = getNumbers();
+        
+        let result = numbers[0];  // gan ket qua bang so dau tien trong mang getNumbers
+        
+        if(getNumbers().length < 2){
+            throw new ArgumentError();
         }
-        console.log(1);
-        return 0;
+        
+        console.log(arrOperation, numbers);
+        let n = 1;
+        arrOperation.forEach(value => {
+            if(value === 'plus'){
+                result += numbers[n];
+            }
+            if(value === 'minus'){
+                result -= numbers[n];
+            }
+            if(value === 'multiplied'){
+                result *= numbers[n];
+            }
+            if(value === 'divided'){
+                result /= numbers[n];
+            }
+            n++;
+        });
+        return result;
     }
 }
-let ArgumentError;
+let ArgumentError: any;
 export {WordProblem,ArgumentError}
