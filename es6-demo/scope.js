@@ -26,7 +26,7 @@ var myFunction = function () {
     var myOtherFunction = function () {
         console.log('My name is ' + name);
     };
-    console.log(name);
+    return console.log(name);
     myOtherFunction(); // call function
 };
 
