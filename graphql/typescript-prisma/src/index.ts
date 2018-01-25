@@ -34,15 +34,6 @@ const resolvers = {
         info,
       )
     },
-    // updateTitle(parent, {id, newTitle}, context: Context, info){
-    //   return context.db.mutation.updatePost(
-    //     {
-    //       where: {id},
-    //       data: { title: newTitle },
-    //     }, 
-    //     info,
-    //   )
-    // }
   },
 }
 
