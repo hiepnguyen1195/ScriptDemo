@@ -43,6 +43,8 @@ type Query {
 
 type Mutation {
   updateAuthor (id: Int!, input: AuthorInput!): Author
+  createAuthor (input: AuthorInput!): Author
+  deleteAuthor(id: Int!): Author
 }
 
 schema {
@@ -65,17 +67,35 @@ const resolvers = {
     },
   },
   Mutation: {
+    createAuthor(obj: object, args:any) {
+      let data = Object.keys(args.input).map(key=>args.input[key]);
+      console.log(args.input, data);
+      let getIdRandom = require('crypto').randomBytes(10).toString('hex');
+      let author = {
+        id: getIdRandom,
+        firstName: data[0],
+        lastName: data[1]
+      }
+      authors.push(author);
+      return author;
+    },
     updateAuthor(obj: object, args:any) {
-      console.log(args.input);
       let author = find(authors, { id: args.id });
-      let data: string[][] = Object.entries(args.input);
-      console.log(data);
+      let data = Object.keys(args.input).map(key=>args.input[key]);
       if (!author) {
         throw new Error(`Couldn't find with id ${args.id}`);
       }
-      author.firstName = data[0][1];
-      author.lastName  = data[1][1];
-      // console.log(author);
+      author.firstName = data[0];
+      author.lastName  = data[1];
+      console.log(author);
+      return author;
+    },
+    deleteAuthor(obj: object, args:any){
+      let author = find(authors, { id: args.id });
+      let deleteAuthor = authors.filter( value =>{
+        return value.id !== args.id;
+      });
+      authors = deleteAuthor;
       return author;
     },
   },
