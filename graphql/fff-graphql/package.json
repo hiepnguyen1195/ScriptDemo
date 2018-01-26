@@ -5,13 +5,15 @@
   "main": "server.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "ts-node server.ts"
+    "start": "ts-node server.ts",
+    "relay": "relay-compiler --src ./src --schema ./schema.graphql"
   },
   "author": "",
   "license": "ISC",
   "dependencies": {
     "@types/lodash": "^4.14.96",
     "@types/node": "^9.3.0",
+    "@types/node-fetch": "^1.6.7",
     "apollo-cache-inmemory": "^1.1.5",
     "apollo-client": "^2.2.0",
     "apollo-client-preset": "^1.0.6",
@@ -23,8 +25,14 @@
     "graphql-tag": "^2.6.1",
     "graphql-tools": "^0.11.0",
     "lodash": "^4.17.4",
+    "react": "^16.2.0",
     "react-apollo": "^2.0.4",
-    "xmlhttprequest": "^1.8.0",
-    "@types/node-fetch": "^1.6.7"
+    "react-dom": "^16.2.0",
+    "react-relay": "^1.4.1",
+    "xmlhttprequest": "^1.8.0"
+  },
+  "devDependencies": {
+    "babel-plugin-relay": "^1.4.1",
+    "relay-compiler": "^1.4.1"
   }
 }
