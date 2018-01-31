@@ -16,9 +16,9 @@ class App extends Component {
 */
   render() {
     return (
-      <div className="center w85">
+      <div className="center">
         <Header />
-        <div className="ph3 pv1 background-gray">
+        <div className="container background-gray">
           <Switch>
             <Route exact path="/" component={PostList} />
             <Route exact path="/create" component={CreatePost} />

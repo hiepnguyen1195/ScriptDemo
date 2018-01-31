@@ -29,7 +29,7 @@ class PostList extends Component {
     const postsToRender = this.props.postQuery.posts
     
     return (
-      <div>
+      <div className="pt4">
         <ul className="list-group">
           {postsToRender.map(post => <Post key={post.id} post={post} />)}
         </ul>
@@ -44,6 +44,10 @@ const POST_QUERY = gql`
     posts {
       id
       title
+      createdAt
+      author {
+        firstName
+      }
       votes
     }
   }

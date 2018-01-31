@@ -1,6 +1,7 @@
-import React, { Component } from 'react'
-import { graphql } from 'react-apollo'
-import gql from 'graphql-tag'
+import React, { Component } from 'react';
+import { graphql } from 'react-apollo';
+import gql from 'graphql-tag';
+import { timeDifferenceForDate } from '../utils';
 
 class Post extends Component {
 
@@ -10,6 +11,11 @@ class Post extends Component {
       <li className="list-group-item" >
           {this.props.post.title} - {this.props.post.votes} (votes)
           <span className="badge" onClick= {() => this._delLink() }>X</span>
+          <div className="f6 lh-copy gray">
+            by {
+              this.props.post.author ? this.props.post.author.firstName : 'Unknown'
+              } - {timeDifferenceForDate(this.props.post.createdAt)}
+          </div>
       </li>
     )
   }

@@ -13,8 +13,8 @@ class CreatePost extends Component {
 
   render() {
     return (
-      <div>
-        <div className="flex flex-column mt3">
+      <div className= "pt4">
+        <div className="flex flex-column">
           <input
             className="mb2 form-control"
             value={this.state.title}
@@ -22,13 +22,6 @@ class CreatePost extends Component {
             //onChange được gọi mỗi khi thay đổi giá trị trong input box, giá trị input sẽ thay đổi state name thông qua hàm setState
             type="text"
             placeholder="A title for the post"
-          />
-          <input
-            className="mb2 form-control"
-            value={this.state.votes}
-            onChange={e => this.setState({ votes: e.target.value })}
-            type="text"
-            placeholder="The votes for the post"
           />
           <input
             className="mb2 form-control"
