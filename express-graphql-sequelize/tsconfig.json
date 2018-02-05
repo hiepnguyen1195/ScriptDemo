@@ -2,8 +2,24 @@
   "compilerOptions": {
       "module": "commonjs",
       "target": "es2017",
-      "lib": ["dom", "es2017","esnext.asynciterable"],
-      "forceConsistentCasingInFileNames": true
+      "forceConsistentCasingInFileNames": true,
+      "allowJs": true,
+      "checkJs": false,
+      "outDir": "dist",
+      "sourceMap": true,
+      "strict": true,
+      "baseUrl": ".",
+      "moduleResolution": "node",
+      "noImplicitAny": false,
+      "strictFunctionTypes": false,
+      "lib": [
+        "dom", 
+        "es2017",
+        "esnext"
+      ]
   },
-  "exclude": ["node_modules"]
+  "include": [
+    "src/**/*"
+  ],
+  "exclude": ["node_modules", "lib"]
 }

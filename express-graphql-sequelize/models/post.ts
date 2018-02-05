@@ -1,10 +1,10 @@
-'use strict';
-const Post = (sequelize, DataTypes) => {
+'use strict'
+const Posts = (sequelize, DataTypes) => {
   const Post = sequelize.define('Post', {
     id: {
       type: DataTypes.UUID,
       primaryKey: true,
-      defaultValue: DataTypes.UUIDV4
+      defaultValue: DataTypes.UUIDV4,
     },
     title: DataTypes.STRING,
     content: DataTypes.STRING,
@@ -13,12 +13,12 @@ const Post = (sequelize, DataTypes) => {
     deleteAt: DataTypes.DATE,
   }, {
     classMethods: {
-      associate: function(models) {
+      associate: (models) => {
         // associations can be defined here
-      }
-    }
-  });
-  return Post;
-};
+      },
+    },
+  })
+  return Post
+}
 
-export default Post;
+export default Posts

@@ -1,69 +1,71 @@
-import { Router, Request, Response, NextFunction } from 'express';
-import * as sequelize from '../models/index';
+import { Request, Response } from 'express'
+import * as sequelize from '../models/index'
 
-const Post = sequelize['Post'];
+const Post = sequelize[`Post`]
 
-class PostRouter{
+class PostRouter {
 
-  getPosts = (req: Request, res: Response, next: NextFunction): void => {
+  public getPosts = (req: Request, res: Response): void => {
     Post.findAll()
-    .then(posts => res.json(posts))
-    .catch(error => {
-      res.json({ error });
-    });
+    .then((posts) => res.json(posts))
+    .catch((error) => {
+      res.json({ error })
+    })
   }
 
-  getPost = (req: Request, res: Response, next: NextFunction): void => {
-    const getId = req.params.id;
-    console.log(getId);
+  public getPost = (req: Request, res: Response): void => {
+    const getId = req.params.id
     Post.findOne({
-      where: { id: getId }
-    }).then(posts => {
-      res.json(posts);
-    }).catch( error => {
-      res.status(500).json({ error });
-    });
+      where: { id: getId },
+    })
+    .then((posts) => {
+      if (!posts) {
+        res.status(500).json({ Error: 'Post not found!' })
+      }
+      res.json(posts)
+    })
+    .catch( (error) => {
+      res.status(500).json({ error })
+    })
   }
 
-  createPost = (req: Request, res: Response, next: NextFunction): void => {
-    if(!req.body.title){
-      throw new Error("title is empty");
+  public createPost = (req: Request, res: Response): void => {
+    if (JSON.stringify(req.body) === '{}') {
+      return res.status(400).json({ Error: 'Create request body is empty' })
     }
     Post.create(req.body)
-    .then(newPost => {
-        res.json(newPost);
+    .then((newPost) => {
+        res.status(201).json(newPost)
       })
-    .catch(error => {
-      res.status(422).json({ error });
-    });
+    .catch((error) => {
+      res.status(422).json({ error })
+    })
   }
 
-  updatePost = (req: Request, res: Response, next: NextFunction): void => {
-    const id = req.params.id;
-      Post.find({
-        where: { id: id }
-      })
-      .then(post => post.update(req.body))
-      .then(updatedPost => {
-          res.json(updatedPost);
-      })
-      .catch(error => {
-        res.status(500).json({ error });
-      });
+  public updatePost = (req: Request, res: Response): void => {
+    const getId = req.params.id
+    Post.find({
+      where: { id: getId },
+    })
+    .then((post) => post.update(req.body))
+    .then((updatedPost) => res.json(updatedPost))
+    .catch((error) => {
+      res.status(500).json({ error: 'update failed' })
+    })
   }
 
-  deletePost = (req: Request, res: Response, next: NextFunction): void => {
-    const id = req.params.id;
-    console.log(id);
+  public deletePost = (req: Request, res: Response): void => {
+    const getId = req.params.id
     Post.destroy({
-      where: { id: id },
-    }).then(() => {
-      res.status(200).end();
-    }).catch(error => {
-      res.status(500).json({ error });
-    });
+      where: { id: getId },
+    })
+    .then((result) => {
+      res.json('Deleted successfully')
+    })
+    .catch((err) => {
+      res.status(500).json({ error: 'delete failed' })
+    })
   }
-  
 }
 
-export default PostRouter;
+export default PostRouter
