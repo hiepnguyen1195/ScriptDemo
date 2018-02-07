@@ -1,4 +1,3 @@
-import { GraphQLScalarType } from 'graphql'
 import * as sequelize from '../../models/index'
 
 const Post = sequelize[`Post`]

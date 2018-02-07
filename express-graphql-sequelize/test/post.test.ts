@@ -1,43 +1,91 @@
-import * as request from 'request'
+process.env.NODE_ENV = 'test'
 
-const baseUrl = `http://localhost:4000/api/post`
+import {} from 'jest'
+import * as request from 'request'
+import seed from './seed'
+import * as sequelize from '../models/index'
+import * as crypto from 'crypto'
+import Server from '../src/server'
+
+const app = new Server()
+app.start()
+const Posts = sequelize[`Post`]
+
+beforeAll((done) => {
+    Posts.sync({ force: true })
+    .then(() => {
+        return seed(Posts)
+    }).then(() => {
+        done()
+    })
+})
+
+afterAll(() => {
+    return Posts.drop()
+})
+
+const dtUpdate = {
+    title: 'update post title',
+    content: 'update post content',
+}
 
 describe('/GET posts', () => {
-    it('get all the post', (done) => {
-        request.get(`${baseUrl}`, (error, response, body) => {
+    it('GET should return all post', (done) => {
+        request.get('http://localhost:4000/api/posts', (error, response, body) => {
             const bodyObj = JSON.parse(body)
-            // console.log(bodyObj, error)
+            // console.log(bodyObj)
             expect(response.statusCode).toEqual(200)
-            expect(bodyObj.length).toEqual(7)
+            expect(bodyObj.length).toBeGreaterThan(0)
             done()
         })
     })
 
-    it('get the post id', (done) => {
-        request.get(`${baseUrl}/5c8af476-b6f3-46e2-a358-5c2db76506ab`, (error, response, body) => {
+    xit('GET should return empty post', (done) => {
+        request.get('http://localhost:4000/api/posts', (error, response, body) => {
             const bodyObj = JSON.parse(body)
             expect(response.statusCode).toEqual(200)
-            expect(bodyObj.title).toEqual('post 1')
-            expect(bodyObj.content).toEqual('hello world')
+            expect(bodyObj.length).toBe(0)
+            done()
+        })
+    })
+
+    it('GET/:id should return post id', (done) => {
+        Posts.findAll()
+        .then((result) => {
+            const id = result[0].id
+            request.get(`http://localhost:4000/api/posts/${id}`, (error, response, body) => {
+            const bodyObj = JSON.parse(body)
+            expect(response.statusCode).toEqual(200)
+            expect(bodyObj.id).toEqual(id)
+            done()
+            })
+        })
+    })
+
+    it('GET/:id should post id not found', (done) => {
+        request.get(`http://localhost:4000/api/posts/1`, (error, response, body) => {
+            const bodyObj = JSON.parse(body)
+            expect(response.statusCode).toEqual(404)
+            expect(bodyObj.error).toEqual('Post not found!')
             done()
         })
     })
 })
 
 describe('/POST posts', () => {
-    xit('/POST create post id', (done) => {
+    it('POST should add new post', (done) => {
         const data = {
             title: 'create post 1',
             content: 'test 1',
         }
         request.post({
             headers: {'content-type' : 'application/json'},
-            url: baseUrl,
+            url: 'http://localhost:4000/api/posts',
             json: data,
             }, (error, response, body) => {
                 expect(response.statusCode).toEqual(201)
-                expect(body.title).toEqual('create post 1')
-                expect(body.content).toEqual('test 1')
+                expect(body.title).toEqual(data.title)
+                expect(body.content).toEqual(data.content)
                 done()
             },
         )
@@ -47,7 +95,7 @@ describe('/POST posts', () => {
         const data = {}
         request.post({
             headers: {'content-type' : 'application/json'},
-            url: baseUrl,
+            url: 'http://localhost:4000/api/posts',
             json: data,
             }, (error, response, body) => {
                 expect(response.statusCode).toEqual(400)
@@ -59,33 +107,30 @@ describe('/POST posts', () => {
 })
 
 describe('/PUT posts', () => {
-    it('/POST update post id', (done) => {
-        const data = {
-            title: 'update post title 11',
-            content: 'update post content 1',
-        }
-        request.put({
+    it('/PUT should update post id', (done) => {
+        Posts.findAll()
+        .then((result) => {
+            const id = result[0].id
+            request.put({
                 headers: {'content-type' : 'application/json'},
-                url: `${baseUrl}/3b354572-fe6c-424c-a488-a01bc8f8d28d`,
-                json: data,
+                url: `http://localhost:4000/api/posts/${id}`,
+                json: dtUpdate,
             }, (error, response, body) => {
                 expect(response.statusCode).toEqual(200)
-                expect(body.title).toEqual('update post title 11')
-                expect(body.content).toEqual('update post content 1')
+                expect(body.title).toEqual(dtUpdate.title)
+                expect(body.content).toEqual(dtUpdate.content)
                 done()
             },
-        )
+            )
+        })
     })
 
-    it('/post/:id update post not found id', (done) => {
-        const data = {
-            title: 'update post title 11',
-            content: 'update post content 1',
-        }
+    it('/put/:id update post not found id', (done) => {
+        const id = crypto.randomBytes(20).toString('hex')
         request.put({
                 headers: {'content-type' : 'application/json'},
-                url: `${baseUrl}/3b354572-fe6c-424c-a488-a01bc8f8d28qưeqưed`,
-                json: data,
+                url: `http://localhost:4000/api/posts/${id}`,
+                json: dtUpdate,
             }, (error, response, body) => {
                 expect(response.statusCode).toEqual(500)
                 expect(body.error).toEqual('update failed')
@@ -96,16 +141,21 @@ describe('/PUT posts', () => {
 })
 
 describe('/DELETE posts', () => {
-    xit('delete the post id', (done) => {
-        request.delete(`${baseUrl}/95c1d6f9-afc5-43a0-b2a0-46138ce519d8`, (error, response, body) => {
-            const bodyObj = JSON.parse(body)
-            expect(response.statusCode).toEqual(200)
-            done()
+    it('delete the post id', (done) => {
+        Posts.findAll()
+        .then((result) => {
+            const id = result[0].id
+            request.delete(`http://localhost:4000/api/posts/${id}`, (error, response, body) => {
+                const bodyObj = JSON.parse(body)
+                expect(response.statusCode).toEqual(200)
+                done()
+            })
         })
     })
 
     it('delete the post with id empty', (done) => {
-        request.delete(baseUrl, (error, response, body) => {
+        const id = crypto.randomBytes(20).toString('hex')
+        request.delete(`http://localhost:4000/api/posts/${id}`, (error, response, body) => {
             expect(response.statusCode).toEqual(404)
             done()
         })

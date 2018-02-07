@@ -5,16 +5,21 @@ import myGraphQLSchema from './schema'
 
 import routerPost from '../rest/routes'
 
-const app = express()
+const PORT: number = 4000
 
-app.use(bodyParser.json())
+export default class Server {
+    public baseUrl: string = ''
+    public start() {
+        const app = express()
 
-app.use('/api/', routerPost)
+        app.use(bodyParser.json())
 
-app.use('/graphql', bodyParser.json(), graphqlExpress({ schema: myGraphQLSchema }))
+        app.use('/api/', routerPost)
 
-app.get('/graphiql', graphiqlExpress({ endpointURL: '/graphql' }))
+        app.use('/graphql', bodyParser.json(), graphqlExpress({ schema: myGraphQLSchema }))
 
-app.listen(4000)
+        app.get('/graphiql', graphiqlExpress({ endpointURL: '/graphql' }))
 
-// console.log('GraphQL Server running on localhost:4000')
+        app.listen(PORT)
+    }
+}

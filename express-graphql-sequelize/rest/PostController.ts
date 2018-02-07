@@ -1,12 +1,12 @@
 import { Request, Response } from 'express'
 import * as sequelize from '../models/index'
 
-const Post = sequelize[`Post`]
+const Posts = sequelize[`Post`]
 
 class PostRouter {
 
   public getPosts = (req: Request, res: Response): void => {
-    Post.findAll()
+    Posts.findAll()
     .then((posts) => res.json(posts))
     .catch((error) => {
       res.json({ error })
@@ -15,17 +15,17 @@ class PostRouter {
 
   public getPost = (req: Request, res: Response): void => {
     const getId = req.params.id
-    Post.findOne({
+    Posts.findOne({
       where: { id: getId },
     })
     .then((posts) => {
       if (!posts) {
-        res.status(500).json({ Error: 'Post not found!' })
+        return res.status(404).json({ error: 'Post not found!' })
       }
       res.json(posts)
     })
     .catch( (error) => {
-      res.status(500).json({ error })
+      res.status(404).json({ error: 'Post not found!' })
     })
   }
 
@@ -33,7 +33,7 @@ class PostRouter {
     if (JSON.stringify(req.body) === '{}') {
       return res.status(400).json({ Error: 'Create request body is empty' })
     }
-    Post.create(req.body)
+    Posts.create(req.body)
     .then((newPost) => {
         res.status(201).json(newPost)
       })
@@ -44,7 +44,7 @@ class PostRouter {
 
   public updatePost = (req: Request, res: Response): void => {
     const getId = req.params.id
-    Post.find({
+    Posts.find({
       where: { id: getId },
     })
     .then((post) => post.update(req.body))
@@ -56,14 +56,15 @@ class PostRouter {
 
   public deletePost = (req: Request, res: Response): void => {
     const getId = req.params.id
-    Post.destroy({
+    Posts.find({
       where: { id: getId },
     })
     .then((result) => {
+      result.destroy()
       res.json('Deleted successfully')
     })
     .catch((err) => {
-      res.status(500).json({ error: 'delete failed' })
+      res.status(404).json({ error: 'delete failed, not found id' })
     })
   }
 }

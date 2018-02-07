@@ -5,7 +5,7 @@
   "main": "server.js",
   "scripts": {
     "test": "jest",
-    "start": "ts-node ./src/server.ts",
+    "start": "ts-node ./src/index.ts",
     "lint": "tslint -c tslint.json -t stylish -p ./tsconfig.json"
   },
   "author": "hiepnn",

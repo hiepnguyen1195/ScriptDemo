@@ -2,16 +2,18 @@
 import * as fs from 'fs'
 import * as path from 'path'
 import * as Sequelize from 'sequelize'
+import config from '../config/config'
 
-const database = 'graphql'
-const username = 'root'
-const password = 'root'
+const env  = process.env.NODE_ENV || 'development'
 
-const sequelize = new Sequelize(database, username, password, {
-  dialect: 'mysql',
-  port: 3306,
-  host: '127.0.0.1',
-})
+const dbConfig = config[env]
+
+const sequelize = new Sequelize(
+  dbConfig[`database`],
+  dbConfig[`username`],
+  dbConfig[`password`],
+  dbConfig,
+)
 
 const db = {}
 const basename  = path.basename(module.filename)

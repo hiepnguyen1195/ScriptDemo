@@ -1,5 +1,4 @@
 const typeDefs = `
-
     scalar DateTime
 
     type Post {

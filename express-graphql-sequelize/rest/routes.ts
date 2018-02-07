@@ -5,10 +5,10 @@ const routerPost = express.Router()
 
 const post = new PostRouter()
 
-routerPost.get('/post/', post.getPosts)
-routerPost.get('/post/:id', post.getPost)
-routerPost.post('/post/', post.createPost)
-routerPost.put('/post/:id', post.updatePost)
-routerPost.delete('/post/:id', post.deletePost)
+routerPost.get('/posts/', post.getPosts)
+routerPost.get('/posts/:id', post.getPost)
+routerPost.post('/posts/', post.createPost)
+routerPost.put('/posts/:id', post.updatePost)
+routerPost.delete('/posts/:id', post.deletePost)
 
 export default routerPost
