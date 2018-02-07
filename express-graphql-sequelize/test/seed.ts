@@ -5,5 +5,5 @@ export default function seed(models) {
         createdAt: new Date(2013, 11, 24),
         updatedAt: new Date(2013, 11, 24),
     })
-    .catch((e) => console.log(e))
+    .catch((e) => e)
 }

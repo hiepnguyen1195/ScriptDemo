@@ -7,6 +7,9 @@ import * as sequelize from '../models/index'
 import * as crypto from 'crypto'
 import Server from '../src/server'
 
+import { graphql } from 'graphql'
+import schema from '../src/schema'
+
 const app = new Server()
 app.start()
 const Posts = sequelize[`Post`]
@@ -20,17 +23,17 @@ beforeAll((done) => {
     })
 })
 
-afterAll(() => {
-    return Posts.drop()
-})
+// afterAll(() => {
+//     return Posts.drop()
+// })
 
 const dtUpdate = {
     title: 'update post title',
     content: 'update post content',
 }
 
-describe('/GET posts', () => {
-    it('GET should return all post', (done) => {
+describe('RESTful API test', () => {
+    it('GET /posts should return all post', (done) => {
         request.get('http://localhost:4000/api/posts', (error, response, body) => {
             const bodyObj = JSON.parse(body)
             // console.log(bodyObj)
@@ -40,7 +43,7 @@ describe('/GET posts', () => {
         })
     })
 
-    xit('GET should return empty post', (done) => {
+    xit('GET /posts should return empty post', (done) => {
         request.get('http://localhost:4000/api/posts', (error, response, body) => {
             const bodyObj = JSON.parse(body)
             expect(response.statusCode).toEqual(200)
@@ -49,7 +52,7 @@ describe('/GET posts', () => {
         })
     })
 
-    it('GET/:id should return post id', (done) => {
+    it('GET /posts/:id should return post id', (done) => {
         Posts.findAll()
         .then((result) => {
             const id = result[0].id
@@ -62,7 +65,7 @@ describe('/GET posts', () => {
         })
     })
 
-    it('GET/:id should post id not found', (done) => {
+    it('GET /posts/:id should post id not found', (done) => {
         request.get(`http://localhost:4000/api/posts/1`, (error, response, body) => {
             const bodyObj = JSON.parse(body)
             expect(response.statusCode).toEqual(404)
@@ -70,10 +73,8 @@ describe('/GET posts', () => {
             done()
         })
     })
-})
 
-describe('/POST posts', () => {
-    it('POST should add new post', (done) => {
+    it('POST /posts should add new post', (done) => {
         const data = {
             title: 'create post 1',
             content: 'test 1',
@@ -104,9 +105,7 @@ describe('/POST posts', () => {
             },
         )
     })
-})
 
-describe('/PUT posts', () => {
     it('/PUT should update post id', (done) => {
         Posts.findAll()
         .then((result) => {
@@ -125,7 +124,7 @@ describe('/PUT posts', () => {
         })
     })
 
-    it('/put/:id update post not found id', (done) => {
+    it('/PUT/:id update post not found id', (done) => {
         const id = crypto.randomBytes(20).toString('hex')
         request.put({
                 headers: {'content-type' : 'application/json'},
@@ -138,10 +137,8 @@ describe('/PUT posts', () => {
             },
         )
     })
-})
 
-describe('/DELETE posts', () => {
-    it('delete the post id', (done) => {
+    it('DELETE the post id', (done) => {
         Posts.findAll()
         .then((result) => {
             const id = result[0].id
@@ -153,11 +150,97 @@ describe('/DELETE posts', () => {
         })
     })
 
-    it('delete the post with id empty', (done) => {
+    it('DELETE the post with id empty', (done) => {
         const id = crypto.randomBytes(20).toString('hex')
         request.delete(`http://localhost:4000/api/posts/${id}`, (error, response, body) => {
             expect(response.statusCode).toEqual(404)
             done()
         })
+    })
+})
+
+describe('Graphql test', () => {
+    it('Query test posts', async () => {
+        const query = `
+            query {
+                posts {
+                    id
+                    title
+                    content
+                }
+            }
+        `
+        const result = await graphql(schema, query)
+        const { data } = result
+        expect(data).toHaveProperty('posts')
+    })
+
+    it('Query test get posts/:id', async () => {
+        const rid = Posts.findAll()
+        .then((post) => {
+            console.log(post)
+            return post[0].id
+        })
+        const query = `
+            query {
+                post(id: "${rid}") {
+                    id
+                    title
+                }
+            }
+        `
+        const result = await graphql(schema, query)
+        const { data } = result
+        expect(data).toHaveProperty('post', null)
+    })
+
+    it('test query not found id posts/:id', async () => {
+        Posts.findAll()
+        .then((post) => {
+            const id = post[0].id
+        })
+        const query = `
+            query {
+                post(id: "") {
+                    id
+                    title
+                }
+            }
+        `
+        const result = await graphql(schema, query)
+        const { data } = result
+        expect(data).toHaveProperty('post', null)
+    })
+
+    it('Mutation create posts done', async () => {
+        const query = `
+            mutation {
+                createPost (title: "test create", content: "content post") {
+                    id
+                    title
+                    content
+                }
+            }
+        `
+        const result = await graphql(schema, query)
+        const { data } = result
+        expect(data).toHaveProperty('createPost')
+        expect(data.createPost.title).toBe('test create')
+        expect(data.createPost.content).toBe('content post')
+    })
+
+    it('Mutation create posts error', async () => {
+        const query = `
+            mutation {
+                createPost (content: "content post") {
+                    id
+                    title
+                    content
+                }
+            }
+        `
+        const result = await graphql(schema, query)
+        const { errors } = result
+        expect(errors).toHaveProperty('graphQLErrors')
     })
 })
