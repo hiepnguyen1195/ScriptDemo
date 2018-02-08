@@ -20,9 +20,9 @@ beforeAll((done) => {
     })
 })
 
-// afterAll(() => {
-//     return Posts.drop()
-// })
+afterAll(() => {
+    return Posts.drop()
+})
 
 describe('RESTful API test', () => {
     it('GET /posts should return all post', (done) => {
@@ -36,12 +36,14 @@ describe('RESTful API test', () => {
     })
 
     xit('GET /posts should return empty post', (done) => {
+        Posts.truncate()
         request(app)
         .get('/api/posts/')
         .then((response) => {
             expect(response.statusCode).toBe(200)
             expect(response.body).toHaveLength(0)
         })
+        .then(() => seed(Posts))
         done()
     })
 
