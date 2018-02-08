@@ -61,10 +61,10 @@ class PostRouter {
     })
     .then((result) => {
       result.destroy()
-      res.json('Deleted successfully')
+      res.json( {message: 'Deleted successfully'})
     })
     .catch((err) => {
-      res.status(404).json({ error: 'delete failed, not found id' })
+      res.status(500).json({ error: 'delete failed' })
     })
   }
 }

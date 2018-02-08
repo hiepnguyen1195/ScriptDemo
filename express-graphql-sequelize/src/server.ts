@@ -7,19 +7,16 @@ import routerPost from '../rest/routes'
 
 const PORT: number = 4000
 
-export default class Server {
-    public baseUrl: string = ''
-    public start() {
-        const app = express()
+const app = express()
 
-        app.use(bodyParser.json())
+app.use(bodyParser.json())
 
-        app.use('/api/', routerPost)
+app.use('/api/', routerPost)
 
-        app.use('/graphql', bodyParser.json(), graphqlExpress({ schema: myGraphQLSchema }))
+app.use('/graphql', bodyParser.json(), graphqlExpress({ schema: myGraphQLSchema }))
 
-        app.get('/graphiql', graphiqlExpress({ endpointURL: '/graphql' }))
+app.get('/graphiql', graphiqlExpress({ endpointURL: '/graphql' }))
 
-        app.listen(PORT)
-    }
-}
+app.listen(PORT)
+
+export default app

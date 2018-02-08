@@ -1,53 +1,45 @@
 process.env.NODE_ENV = 'test'
 
 import {} from 'jest'
-import * as request from 'request'
+import * as req from 'request'
+import * as request from 'supertest'
 import seed from './seed'
 import * as sequelize from '../models/index'
-import * as crypto from 'crypto'
-import Server from '../src/server'
-
 import { graphql } from 'graphql'
 import schema from '../src/schema'
 
-const app = new Server()
-app.start()
+import app from '../src/server'
+
 const Posts = sequelize[`Post`]
 
 beforeAll((done) => {
     Posts.sync({ force: true })
+    .then(() => seed(Posts))
     .then(() => {
-        return seed(Posts)
-    }).then(() => {
         done()
     })
 })
 
-// afterAll(() => {
-//     return Posts.drop()
-// })
-
-const dtUpdate = {
-    title: 'update post title',
-    content: 'update post content',
-}
+afterAll(() => {
+    return Posts.drop()
+})
 
 describe('RESTful API test', () => {
     it('GET /posts should return all post', (done) => {
-        request.get('http://localhost:4000/api/posts', (error, response, body) => {
-            const bodyObj = JSON.parse(body)
-            // console.log(bodyObj)
-            expect(response.statusCode).toEqual(200)
-            expect(bodyObj.length).toBeGreaterThan(0)
+        request(app)
+        .get('/api/posts/')
+        .then((response) => {
+            expect(response.statusCode).toBe(200)
+            expect(response.body).toEqual(expect.any(Array))
             done()
         })
     })
 
     xit('GET /posts should return empty post', (done) => {
-        request.get('http://localhost:4000/api/posts', (error, response, body) => {
-            const bodyObj = JSON.parse(body)
-            expect(response.statusCode).toEqual(200)
-            expect(bodyObj.length).toBe(0)
+        request(app)
+        .get('/api/posts/')
+        .then((response) => {
+            expect(response.statusCode).toBe(200)
             done()
         })
     })
@@ -56,104 +48,135 @@ describe('RESTful API test', () => {
         Posts.findAll()
         .then((result) => {
             const id = result[0].id
-            request.get(`http://localhost:4000/api/posts/${id}`, (error, response, body) => {
-            const bodyObj = JSON.parse(body)
-            expect(response.statusCode).toEqual(200)
-            expect(bodyObj.id).toEqual(id)
-            done()
+            request(app)
+            .get(`/api/posts/${id}`)
+            .then((response) => {
+                expect(response.statusCode).toBe(200)
+                expect(response.body.content).toBe('Post content demo')
+                done()
             })
         })
     })
 
-    it('GET /posts/:id should post id not found', (done) => {
-        request.get(`http://localhost:4000/api/posts/1`, (error, response, body) => {
-            const bodyObj = JSON.parse(body)
-            expect(response.statusCode).toEqual(404)
-            expect(bodyObj.error).toEqual('Post not found!')
+    it('GET /posts/:id post id not found', (done) => {
+        request(app)
+        .get(`/api/posts/1`)
+        .then((response) => {
+            expect(response.statusCode).toBe(404)
+            expect(response.body.error).toBe('Post not found!')
             done()
         })
     })
 
-    it('POST /posts should add new post', (done) => {
+    it('POST/ posts should add new post', (done) => {
         const data = {
             title: 'create post 1',
             content: 'test 1',
         }
-        request.post({
-            headers: {'content-type' : 'application/json'},
-            url: 'http://localhost:4000/api/posts',
-            json: data,
-            }, (error, response, body) => {
-                expect(response.statusCode).toEqual(201)
-                expect(body.title).toEqual(data.title)
-                expect(body.content).toEqual(data.content)
-                done()
-            },
-        )
-    })
-
-    it('/POST create post with empty field', (done) => {
-        const data = {}
-        request.post({
-            headers: {'content-type' : 'application/json'},
-            url: 'http://localhost:4000/api/posts',
-            json: data,
-            }, (error, response, body) => {
-                expect(response.statusCode).toEqual(400)
-                expect(body.Error).toEqual('Create request body is empty')
-                done()
-            },
-        )
-    })
-
-    it('/PUT should update post id', (done) => {
-        Posts.findAll()
-        .then((result) => {
-            const id = result[0].id
-            request.put({
-                headers: {'content-type' : 'application/json'},
-                url: `http://localhost:4000/api/posts/${id}`,
-                json: dtUpdate,
-            }, (error, response, body) => {
-                expect(response.statusCode).toEqual(200)
-                expect(body.title).toEqual(dtUpdate.title)
-                expect(body.content).toEqual(dtUpdate.content)
-                done()
-            },
-            )
+        request(app)
+        .post(`/api/posts/`)
+        .send(data)
+        .then((response) => {
+            expect(response.statusCode).toBe(201)
+            expect(response.body.title).toEqual(data.title)
+            expect(response.body.content).toEqual(data.content)
+            done()
         })
     })
 
-    it('/PUT/:id update post not found id', (done) => {
-        const id = crypto.randomBytes(20).toString('hex')
-        request.put({
-                headers: {'content-type' : 'application/json'},
-                url: `http://localhost:4000/api/posts/${id}`,
-                json: dtUpdate,
-            }, (error, response, body) => {
-                expect(response.statusCode).toEqual(500)
-                expect(body.error).toEqual('update failed')
+    it('POST/ create post with empty field', (done) => {
+        const data = {}
+        request(app)
+        .post(`/api/posts/`)
+        .send(data)
+        .then((response) => {
+            expect(response.statusCode).toBe(400)
+            expect(response.body.Error).toEqual('Create request body is empty')
+            done()
+        })
+    })
+
+    it('/PUT/:id update post id', (done) => {
+        const dtUpdate = {
+            title: 'update post title',
+            content: 'update post content',
+        }
+        Posts.findAll()
+        .then((result) => {
+            const id = result[0].id
+            request(app)
+            .put(`/api/posts/${id}`)
+            .send(dtUpdate)
+            .then((response) => {
+                expect(response.statusCode).toEqual(200)
+                expect(response.body.title).toEqual(dtUpdate.title)
+                expect(response.body.content).toEqual(dtUpdate.content)
                 done()
-            },
-        )
+            })
+        })
+    })
+
+    it('/PUT should update post empty id', (done) => {
+        const dtUpdate = {
+            title: 'update post title',
+            content: 'update post content',
+        }
+        request(app)
+        .put(`/api/posts/`)
+        .send(dtUpdate)
+        .then((response) => {
+            expect(response.statusCode).toEqual(404)
+            done()
+        })
+    })
+
+    it('/PUT/:id update post id wrong', (done) => {
+        const dtUpdate = {
+            title: 'update post title',
+            content: 'update post content',
+        }
+        const id = Math.random().toString(36).substr(2, 5)
+        request(app)
+        .put(`/api/posts/${id}`)
+        .send(dtUpdate)
+        .then((response) => {
+            expect(response.statusCode).toEqual(500)
+            expect(response.body.error).toEqual('update failed')
+            done()
+        })
     })
 
     it('DELETE the post id', (done) => {
         Posts.findAll()
         .then((result) => {
             const id = result[0].id
-            request.delete(`http://localhost:4000/api/posts/${id}`, (error, response, body) => {
-                const bodyObj = JSON.parse(body)
+            request(app).del(`/api/posts/${id}`)
+            .then((response) => {
                 expect(response.statusCode).toEqual(200)
+                expect(response.body.message).toEqual('Deleted successfully')
                 done()
             })
         })
     })
 
-    it('DELETE the post with id empty', (done) => {
-        const id = crypto.randomBytes(20).toString('hex')
-        request.delete(`http://localhost:4000/api/posts/${id}`, (error, response, body) => {
-            expect(response.statusCode).toEqual(404)
+    it('DELETE the post with empty id', (done) => {
+        Posts.findAll()
+        .then((result) => {
+            const id = result[0].id
+            request(app).del(`/api/posts/`)
+            .then((response) => {
+                expect(response.statusCode).toEqual(404)
+                done()
+            })
+        })
+    })
+
+    it('DELETE the post with id wrong', (done) => {
+        const id = Math.random().toString(36).substr(2, 5)
+        request(app).del(`/api/posts/${id}`)
+        .then((response) => {
+            expect(response.statusCode).toEqual(500)
+            expect(response.body.error).toEqual('delete failed')
             done()
         })
     })
@@ -173,32 +196,29 @@ describe('Graphql test', () => {
         const result = await graphql(schema, query)
         const { data } = result
         expect(data).toHaveProperty('posts')
+        expect(data.posts).toEqual(expect.any(Array))
     })
 
-    it('Query test get posts/:id', async () => {
-        const rid = Posts.findAll()
-        .then((post) => {
-            console.log(post)
-            return post[0].id
-        })
-        const query = `
+    it('Query test get posts/:id',  () => {
+        Posts.findAll()
+        .then( async (post) => {
+            const id = post[0].id
+            const query = `
             query {
-                post(id: "${rid}") {
+                post(id: "${id}") {
                     id
                     title
                 }
             }
-        `
-        const result = await graphql(schema, query)
-        const { data } = result
-        expect(data).toHaveProperty('post', null)
+            `
+            const result = await graphql(schema, query)
+            const { data } = result
+            expect(data).toHaveProperty('post')
+            expect(data).toEqual(expect.any(Object))
+        })
     })
 
-    it('test query not found id posts/:id', async () => {
-        Posts.findAll()
-        .then((post) => {
-            const id = post[0].id
-        })
+    it('Query test posts not found id', async () => {
         const query = `
             query {
                 post(id: "") {
@@ -240,7 +260,73 @@ describe('Graphql test', () => {
             }
         `
         const result = await graphql(schema, query)
-        const { errors } = result
-        expect(errors).toHaveProperty('graphQLErrors')
+        expect(result).toHaveProperty('errors')
+    })
+
+    it('Mutation update posts done', async () => {
+        Posts.findAll()
+        .then( async (post) => {
+            const id = post[0].id
+            const query = `
+                mutation {
+                    updatePost (id: "${id}",title: "graphql update", content: "graphql post") {
+                        id
+                        title
+                        content
+                    }
+                }
+            `
+            const result = await graphql(schema, query)
+            const { data } = result
+            expect(data).toHaveProperty('updatePost')
+            expect(data.updatePost.title).toBe('graphql update')
+            expect(data.updatePost.content).toBe('graphql post')
+        })
+    })
+
+    it('Mutation update posts not found id', async () => {
+        const query = `
+            mutation {
+                updatePost (id: "",title: "test update", content: "update post") {
+                    id
+                    title
+                    content
+                }
+            }
+        `
+        const result = await graphql(schema, query)
+        const { data } = result
+        expect(data).toHaveProperty('updatePost', null)
+    })
+
+    it('Mutation delete posts done', () => {
+        Posts.findAll()
+        .then( async (post) => {
+            const id = post[0].id
+            const query = `
+                mutation {
+                    deletePost (id: "${id}") {
+                        title
+                    }
+                }
+            `
+            const result = await graphql(schema, query)
+            const { data } = result
+            expect(data).toHaveProperty('deletePost')
+        })
+    })
+
+    it('Mutation delete posts not found id', async () => {
+        const id = Math.random().toString(36)
+        const query = `
+            mutation {
+                deletePost (id: "${id}") {
+                    title
+                }
+            }
+        `
+        const result = await graphql(schema, query)
+        const { data } = result
+        expect(data).toHaveProperty('deletePost')
     })
 })

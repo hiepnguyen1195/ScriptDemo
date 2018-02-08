@@ -32,6 +32,7 @@
   "devDependencies": {
     "@types/jest": "^22.1.1",
     "jest": "^22.1.4",
+    "supertest": "^3.0.0",
     "ts-jest": "^22.0.3",
     "tslint": "^5.8.0"
   },
