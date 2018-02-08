@@ -9,6 +9,9 @@ const typeDefs = `
         updatedAt: DateTime
         deletedAt: DateTime
     }
+    type Status {
+        status: String
+    }
     input PostInput{
         title: String!
         content: String
@@ -20,7 +23,7 @@ const typeDefs = `
     type RootMutation {
         createPost(title: String!, content: String): Post
         updatePost(id: ID!, title: String!, content: String): Post
-        deletePost(id: ID!): Post
+        deletePost(id: ID!): Status
     }
     schema {
         query: RootQuery

@@ -20,9 +20,9 @@ beforeAll((done) => {
     })
 })
 
-afterAll(() => {
-    return Posts.drop()
-})
+// afterAll(() => {
+//     return Posts.drop()
+// })
 
 describe('RESTful API test', () => {
     it('GET /posts should return all post', (done) => {
@@ -40,8 +40,9 @@ describe('RESTful API test', () => {
         .get('/api/posts/')
         .then((response) => {
             expect(response.statusCode).toBe(200)
-            done()
+            expect(response.body).toHaveLength(0)
         })
+        done()
     })
 
     it('GET /posts/:id should return post id', (done) => {
@@ -306,13 +307,13 @@ describe('Graphql test', () => {
             const query = `
                 mutation {
                     deletePost (id: "${id}") {
-                        title
+                        status
                     }
                 }
             `
             const result = await graphql(schema, query)
             const { data } = result
-            expect(data).toHaveProperty('deletePost')
+            expect(data.deletePost).toEqual({ status: 'success' })
         })
     })
 
@@ -320,13 +321,26 @@ describe('Graphql test', () => {
         const id = Math.random().toString(36)
         const query = `
             mutation {
-                deletePost (id: "${id}") {
-                    title
+                deletePost (id: "") {
+                    status
                 }
             }
         `
         const result = await graphql(schema, query)
         const { data } = result
-        expect(data).toHaveProperty('deletePost')
+        expect(data.deletePost).toEqual({ status: 'failed' })
+    })
+
+    it('Mutation delete posts systax error', async () => {
+        const id = Math.random().toString(36)
+        const query = `
+            mutation {
+                deletePost (id: "") {
+                    title
+                }
+            }
+        `
+        const result = await graphql(schema, query)
+        expect(result).toHaveProperty('errors')
     })
 })

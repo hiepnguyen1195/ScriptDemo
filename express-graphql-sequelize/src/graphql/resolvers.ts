@@ -26,11 +26,15 @@ const resolvers =  {
             .then((post) => post.update(args))
         },
         deletePost: (obj, args) => {
-            const deletedAt: Date = new Date()
-            Post.destroy({
+            let stt = {}
+            return Post.find({
                 where: { id: args.id },
-            }).catch((e) => e.message)
-            return deletedAt
+            })
+            .then((result) => {
+                result.destroy()
+                return stt = {status: 'success'}
+            })
+            .catch((err) => stt = {status: 'failed'})
         },
     },
 }
