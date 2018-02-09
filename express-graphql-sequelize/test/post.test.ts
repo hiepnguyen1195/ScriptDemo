@@ -1,5 +1,4 @@
 process.env.NODE_ENV = 'test'
-
 import {} from 'jest'
 import * as req from 'request'
 import * as request from 'supertest'
@@ -7,7 +6,6 @@ import seed from './seed'
 import * as sequelize from '../models/index'
 import { graphql } from 'graphql'
 import schema from '../src/schema'
-
 import app from '../src/server'
 
 const Posts = sequelize[`Post`]
@@ -47,17 +45,14 @@ describe('RESTful API test', () => {
         done()
     })
 
-    it('GET /posts/:id should return post id', (done) => {
-        Posts.findAll()
-        .then((result) => {
-            const id = result[0].id
-            request(app)
-            .get(`/api/posts/${id}`)
-            .then((response) => {
-                expect(response.statusCode).toBe(200)
-                expect(response.body.content).toBe('Post content demo')
-                done()
-            })
+    it('GET /posts/:id should return post id', async (done) => {
+        const id = await Posts.findAll().then( (post) => post[0].id)
+        await request(app)
+        .get(`/api/posts/${id}`)
+        .then((response) => {
+            expect(response.statusCode).toBe(200)
+            expect(response.body.content).toBe('Post content demo')
+            done()
         })
     })
 
@@ -99,23 +94,20 @@ describe('RESTful API test', () => {
         })
     })
 
-    it('/PUT/:id update post id', (done) => {
+    it('/PUT/:id update post id', async (done) => {
         const dtUpdate = {
             title: 'update post title',
             content: 'update post content',
         }
-        Posts.findAll()
-        .then((result) => {
-            const id = result[0].id
-            request(app)
-            .put(`/api/posts/${id}`)
-            .send(dtUpdate)
-            .then((response) => {
-                expect(response.statusCode).toEqual(200)
-                expect(response.body.title).toEqual(dtUpdate.title)
-                expect(response.body.content).toEqual(dtUpdate.content)
-                done()
-            })
+        const id = await Posts.findAll().then( (post) => post[0].id)
+        await request(app)
+        .put(`/api/posts/${id}`)
+        .send(dtUpdate)
+        .then((response) => {
+            expect(response.statusCode).toEqual(200)
+            expect(response.body.title).toEqual(dtUpdate.title)
+            expect(response.body.content).toEqual(dtUpdate.content)
+            done()
         })
     })
 
@@ -149,28 +141,21 @@ describe('RESTful API test', () => {
         })
     })
 
-    it('DELETE the post id', (done) => {
-        Posts.findAll()
-        .then((result) => {
-            const id = result[0].id
-            request(app).del(`/api/posts/${id}`)
-            .then((response) => {
-                expect(response.statusCode).toEqual(200)
-                expect(response.body.message).toEqual('Deleted successfully')
-                done()
-            })
+    it('DELETE the post id', async (done) => {
+        const id = await Posts.findAll().then( (post) => post[0].id)
+        await request(app).del(`/api/posts/${id}`)
+        .then((response) => {
+            expect(response.statusCode).toEqual(200)
+            expect(response.body.message).toEqual('Deleted successfully')
+            done()
         })
     })
 
     it('DELETE the post with empty id', (done) => {
-        Posts.findAll()
-        .then((result) => {
-            const id = result[0].id
-            request(app).del(`/api/posts/`)
-            .then((response) => {
-                expect(response.statusCode).toEqual(404)
-                done()
-            })
+        request(app).del(`/api/posts/`)
+        .then((response) => {
+            expect(response.statusCode).toEqual(404)
+            done()
         })
     })
 
@@ -202,23 +187,20 @@ describe('Graphql test', () => {
         expect(data.posts).toEqual(expect.any(Array))
     })
 
-    it('Query test get posts/:id',  () => {
-        Posts.findAll()
-        .then( async (post) => {
-            const id = post[0].id
-            const query = `
+    it('Query test get posts/:id', async () => {
+        const id = await Posts.findAll().then( (post) => post[0].id)
+        const query = `
             query {
                 post(id: "${id}") {
                     id
                     title
                 }
             }
-            `
-            const result = await graphql(schema, query)
-            const { data } = result
-            expect(data).toHaveProperty('post')
-            expect(data).toEqual(expect.any(Object))
-        })
+        `
+        const result = await graphql(schema, query)
+        const { data } = result
+        expect(data).toHaveProperty('post')
+        expect(data).toEqual(expect.any(Object))
     })
 
     it('Query test posts not found id', async () => {
@@ -267,24 +249,21 @@ describe('Graphql test', () => {
     })
 
     it('Mutation update posts done', async () => {
-        Posts.findAll()
-        .then( async (post) => {
-            const id = post[0].id
-            const query = `
-                mutation {
-                    updatePost (id: "${id}",title: "graphql update", content: "graphql post") {
-                        id
-                        title
-                        content
-                    }
+        const id = await Posts.findAll().then( (post) => post[0].id)
+        const query = `
+            mutation {
+                updatePost (id: "${id}",title: "graphql update", content: "graphql post") {
+                    id
+                    title
+                    content
                 }
-            `
-            const result = await graphql(schema, query)
-            const { data } = result
-            expect(data).toHaveProperty('updatePost')
-            expect(data.updatePost.title).toBe('graphql update')
-            expect(data.updatePost.content).toBe('graphql post')
-        })
+            }
+        `
+        const result = await graphql(schema, query)
+        const { data } = result
+        expect(data).toHaveProperty('updatePost')
+        expect(data.updatePost.title).toBe('graphql update')
+        expect(data.updatePost.content).toBe('graphql post')
     })
 
     it('Mutation update posts not found id', async () => {
@@ -302,21 +281,18 @@ describe('Graphql test', () => {
         expect(data).toHaveProperty('updatePost', null)
     })
 
-    it('Mutation delete posts done', () => {
-        Posts.findAll()
-        .then( async (post) => {
-            const id = post[0].id
-            const query = `
-                mutation {
-                    deletePost (id: "${id}") {
-                        status
-                    }
+    it('Mutation delete posts done', async () => {
+        const id = await Posts.findAll().then( (post) => post[0].id)
+        const query = `
+            mutation {
+                deletePost (id: "${id}") {
+                    status
                 }
-            `
-            const result = await graphql(schema, query)
-            const { data } = result
-            expect(data.deletePost).toEqual({ status: 'success' })
-        })
+            }
+        `
+        const result = await graphql(schema, query)
+        const { data } = result
+        expect(data.deletePost).toEqual({ status: 'success' })
     })
 
     it('Mutation delete posts not found id', async () => {
