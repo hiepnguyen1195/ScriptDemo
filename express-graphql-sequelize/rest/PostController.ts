@@ -38,7 +38,7 @@ class PostRouter {
         res.status(201).json(newPost)
       })
     .catch((error) => {
-      res.status(422).json({ error })
+      res.status(500).json({ error })
     })
   }
 

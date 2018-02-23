@@ -33,7 +33,7 @@ describe('RESTful API test', () => {
         })
     })
 
-    xit('GET /posts should return empty post', (done) => {
+    it('GET /posts should return empty post', (done) => {
         Posts.truncate()
         request(app)
         .get('/api/posts/')
@@ -42,7 +42,9 @@ describe('RESTful API test', () => {
             expect(response.body).toHaveLength(0)
         })
         .then(() => seed(Posts))
-        done()
+        .then(() => {
+            done()
+        })
     })
 
     it('GET /posts/:id should return post id', async (done) => {

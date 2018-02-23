@@ -26,7 +26,7 @@ const resolvers =  {
             .then((post) => post.update(args))
         },
         deletePost: (obj, args) => {
-            let stt = {}
+            let stt: {}
             return Post.find({
                 where: { id: args.id },
             })
